@@ -83,7 +83,11 @@ function propertyReferenceViewPlugin(app: any) {
       }
 
       update(update: ViewUpdate) {
-        if (update.docChanged || update.viewportChanged) {
+        if (
+          update.docChanged ||
+          update.viewportChanged ||
+          update.selectionSet
+        ) {
           this.decorations = this.createDecorations(update.view);
         }
       }
@@ -96,6 +100,7 @@ function propertyReferenceViewPlugin(app: any) {
         const content = view.state.doc.toString();
         const frontMatter = extractFrontMatter(content);
         const regex = /{{([\w\-]+)}}/g;
+        const selection = view.state.selection.main;
 
         for (let { from, to } of view.visibleRanges) {
           regex.lastIndex = 0;
@@ -105,10 +110,13 @@ function propertyReferenceViewPlugin(app: any) {
             const start = from + match.index;
             const end = start + match[0].length;
             const value = frontMatter[match[1]];
-            if (value !== undefined) {
+            if (
+              value !== undefined &&
+              !(selection.from >= start && selection.to <= end)
+            ) {
               decorations.push(
                 Decoration.replace({
-                  widget: new InlineWidget(value),
+                  widget: new InlineWidget(match[1], value, view, start, end),
                 }).range(start, end)
               );
             }
@@ -126,18 +134,37 @@ function propertyReferenceViewPlugin(app: any) {
 
 class InlineWidget extends WidgetType {
   value: string;
-  constructor(value: string) {
+  name: string;
+  view: EditorView;
+  from: number;
+  to: number;
+  constructor(
+    name: string,
+    value: string,
+    view: EditorView,
+    from: number,
+    to: number
+  ) {
     super();
+    this.name = name;
     this.value = value;
+    this.view = view;
+    this.from = from;
+    this.to = to;
   }
 
   toDOM() {
     const span = document.createElement("span");
     span.textContent = this.value;
+    span.classList.add("cm-inline-property");
+    span.addEventListener("click", () => {
+      this.view.dispatch({ selection: { anchor: this.from, head: this.to } });
+      this.view.focus();
+    });
     return span;
   }
 
   eq(other: InlineWidget) {
-    return this.value === other.value;
+    return this.value === other.value && this.name === other.name;
   }
 }
