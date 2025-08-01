@@ -1,3 +1,0 @@
-{
-  "external": ["@codemirror/view", "@codemirror/state"]
-}

@@ -134,7 +134,6 @@ class InlineWidget extends WidgetType {
   toDOM() {
     const span = document.createElement("span");
     span.textContent = this.value;
-    span.style.backgroundColor = "var(--text-highlight-bg)";
     return span;
   }
 

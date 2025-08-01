@@ -1,6 +1,6 @@
 {
   "name": "display-properties",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Displays the assigned value of a property key.",
   "main": "lib/main.js",
   "license": "MIT",
