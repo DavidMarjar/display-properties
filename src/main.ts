@@ -98,13 +98,14 @@ function propertyReferenceViewPlugin(app: any) {
         const regex = /{{([\w\-]+)}}/g;
 
         for (let { from, to } of view.visibleRanges) {
+          regex.lastIndex = 0;
           let text = view.state.sliceDoc(from, to);
           let match;
           while ((match = regex.exec(text)) !== null) {
             const start = from + match.index;
             const end = start + match[0].length;
-            const value = frontMatter[match[1]] || match[0];
-            if (value) {
+            const value = frontMatter[match[1]];
+            if (value !== undefined) {
               decorations.push(
                 Decoration.replace({
                   widget: new InlineWidget(value),
