@@ -1,0 +1,9 @@
+{
+  "id": "display-properties",
+  "name": "Display Properties",
+  "description": "Displays the assigned value of a property key.",
+  "author": "DMarjar",
+
+  "minAppVersion": "0.11.0",
+  "version": "0.0.1"
+}
